@@ -55,27 +55,58 @@ class MainActivity : AppCompatActivity() {
         val apiKeyInput = findViewById<EditText>(R.id.api_key_input)
         val addBtn = findViewById<Button>(R.id.add_btn)
         val clearBtn = findViewById<Button>(R.id.clear_btn)
-        val botsList = findViewById<TextView>(R.id.bots_list)
+        val botsContainer = findViewById<android.widget.LinearLayout>(R.id.bots_container)
         
         val prefs = getSharedPreferences("SMSAutoPrefs", Context.MODE_PRIVATE)
 
         fun updateBotsList() {
             val botsStr = prefs.getString("bot_api_keys", "[]") ?: "[]"
+            botsContainer.removeAllViews()
             try {
                 val array = JSONArray(botsStr)
                 if (array.length() == 0) {
-                    botsList.text = "No bots configured."
+                    val tv = TextView(this)
+                    tv.text = "No bots configured."
+                    botsContainer.addView(tv)
                 } else {
-                    val sb = StringBuilder()
                     for (i in 0 until array.length()) {
                         val obj = array.getJSONObject(i)
-                        sb.append("Bot ${i+1}: ✅ Connected\n")
-                        sb.append("URL: ${obj.getString("url")}\n\n")
+                        
+                        // Create a row Layout
+                        val rowLayout = android.widget.LinearLayout(this)
+                        rowLayout.orientation = android.widget.LinearLayout.HORIZONTAL
+                        rowLayout.setPadding(0, 0, 0, 16)
+                        
+                        // Bot info Text
+                        val tv = TextView(this)
+                        tv.text = "Bot ${i+1}: ✅\nURL: ${obj.getString("url")}"
+                        tv.layoutParams = android.widget.LinearLayout.LayoutParams(0, android.widget.LinearLayout.LayoutParams.WRAP_CONTENT, 1f)
+                        
+                        // Delete Button
+                        val delBtn = Button(this)
+                        delBtn.text = "Delete"
+                        delBtn.setOnClickListener {
+                            val newArray = JSONArray()
+                            // Rebuild array without this index
+                            for (j in 0 until array.length()) {
+                                if (j != i) {
+                                    newArray.put(array.getJSONObject(j))
+                                }
+                            }
+                            prefs.edit().putString("bot_api_keys", newArray.toString()).apply()
+                            Toast.makeText(this, "Bot Deleted", Toast.LENGTH_SHORT).show()
+                            updateBotsList()
+                        }
+                        
+                        rowLayout.addView(tv)
+                        rowLayout.addView(delBtn)
+                        botsContainer.addView(rowLayout)
                     }
-                    botsList.text = sb.toString()
                 }
             } catch (e: Exception) {
-                botsList.text = "Error reading bots list."
+                val tv = TextView(this)
+                tv.text = "Error reading bots list."
+                botsContainer.addView(tv)
             }
         }
 

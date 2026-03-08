@@ -54,11 +54,11 @@
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent">
-        <TextView
-            android:id="@+id/bots_list"
+        <LinearLayout
+            android:id="@+id/bots_container"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="No bots configured."/>
+            android:orientation="vertical" />
     </ScrollView>
 
 </LinearLayout>
