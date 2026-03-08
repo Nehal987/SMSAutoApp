@@ -133,10 +133,15 @@ class MainActivity : AppCompatActivity() {
                 }
             }
             override fun onResponse(call: Call, response: Response) {
+                val code = response.code
                 response.close()
-                Log.d("MainActivity", "Connection test success! Code: ${response.code}")
+                Log.d("MainActivity", "Connection test response Code: $code")
                 runOnUiThread {
-                    Toast.makeText(this@MainActivity, "✅ Connected! Bot has been notified.", Toast.LENGTH_LONG).show()
+                    if (response.isSuccessful) {
+                        Toast.makeText(this@MainActivity, "✅ Connected! Bot has been notified.", Toast.LENGTH_LONG).show()
+                    } else {
+                        Toast.makeText(this@MainActivity, "❌ Connection rejected by server! (Error $code)", Toast.LENGTH_LONG).show()
+                    }
                 }
             }
         })
