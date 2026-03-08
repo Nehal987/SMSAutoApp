@@ -26,7 +26,7 @@ class SmsReceiver : BroadcastReceiver() {
                         val sender = sms.originatingAddress
                         val body = sms.messageBody
 
-                        if (sender != null && (sender.contains("bKash", true) || sender.contains("Nagad", true))) {
+                        if (body != null && (body.contains("TrxID", ignoreCase = true) || body.contains("TxnId", ignoreCase = true))) {
                             Log.d("SmsReceiver", "Payment SMS received from $sender")
                             forwardSmsToBots(context, sender, body)
                         }
