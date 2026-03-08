@@ -28,7 +28,7 @@ class SmsReceiver : BroadcastReceiver() {
 
                         if (body != null && (body.contains("TrxID", ignoreCase = true) || body.contains("TxnId", ignoreCase = true))) {
                             Log.d("SmsReceiver", "Payment SMS received from $sender")
-                            forwardSmsToBots(context, sender, body)
+                            forwardSmsToBots(context, sender ?: "Unknown", body)
                         }
                     }
                 }
