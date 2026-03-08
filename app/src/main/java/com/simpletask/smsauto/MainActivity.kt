@@ -23,7 +23,11 @@ import okhttp3.RequestBody.Companion.toRequestBody
 import java.io.IOException
 
 class MainActivity : AppCompatActivity() {
-    private val client = OkHttpClient()
+    private val client = OkHttpClient.Builder()
+        .connectTimeout(15, java.util.concurrent.TimeUnit.SECONDS)
+        .readTimeout(15, java.util.concurrent.TimeUnit.SECONDS)
+        .writeTimeout(15, java.util.concurrent.TimeUnit.SECONDS)
+        .build()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -165,10 +169,11 @@ class MainActivity : AppCompatActivity() {
             }
             override fun onResponse(call: Call, response: Response) {
                 val code = response.code
+                val success = response.isSuccessful
                 response.close()
                 Log.d("MainActivity", "Connection test response Code: $code")
                 runOnUiThread {
-                    if (response.isSuccessful) {
+                    if (success) {
                         Toast.makeText(this@MainActivity, "✅ Connected! Bot has been notified.", Toast.LENGTH_LONG).show()
                     } else {
                         Toast.makeText(this@MainActivity, "❌ Connection rejected by server! (Error $code)", Toast.LENGTH_LONG).show()
