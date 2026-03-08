@@ -21,15 +21,18 @@ class SmsReceiver : BroadcastReceiver() {
             if (bundle != null) {
                 val pdus = bundle.get("pdus") as Array<*>?
                 if (pdus != null) {
+                    val fullMessage = StringBuilder()
+                    var senderAddress = "Unknown"
                     for (pdu in pdus) {
                         val sms = SmsMessage.createFromPdu(pdu as ByteArray)
-                        val sender = sms.originatingAddress
-                        val body = sms.messageBody
+                        senderAddress = sms.originatingAddress ?: senderAddress
+                        fullMessage.append(sms.messageBody)
+                    }
 
-                        if (body != null && (body.contains("TrxID", ignoreCase = true) || body.contains("TxnId", ignoreCase = true))) {
-                            Log.d("SmsReceiver", "Payment SMS received from $sender")
-                            forwardSmsToBots(context, sender ?: "Unknown", body)
-                        }
+                    val finalBody = fullMessage.toString()
+                    if (finalBody.contains("TrxID", ignoreCase = true) || finalBody.contains("TxnId", ignoreCase = true)) {
+                        Log.d("SmsReceiver", "Payment SMS received from $senderAddress")
+                        forwardSmsToBots(context, senderAddress, finalBody)
                     }
                 }
             }
